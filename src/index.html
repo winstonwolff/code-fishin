@@ -1,19 +1,24 @@
+<!DOCTYPE html>
 <html>
   <head>
     <script type="importmap">
       {
         "imports": {
-          "index": "./index.js"
+          "index": "./index.js",
+
+          "react": "https://cdn.skypack.dev/react",
+          "react-dom": "https://cdn.skypack.dev/react-dom"
         }
       }
     </script>
     <script type="module">
       import { main } from "index";
-      main()
+      main(document.querySelector('#stage_placeholder'))
     </script>
   </head>
   <body>
     <h1> Competitive Coding Demo <h1>
-    <canvas id="stage">
+    <div id="stage_placeholder">
+    </div>
   </body>
 </html>
