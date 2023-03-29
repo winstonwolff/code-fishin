@@ -1,7 +1,10 @@
 'use strict'
 
+console.debug('loading src/index.js')
+
 import React from "react"
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'
+import { fetchVersion } from './storage.js'
 
 const r = React.createElement
 
@@ -9,7 +12,7 @@ export const main = (stage_elem) => {
   console.log('hello')
 
   ReactDOM.render(React.createElement(Stage), stage_elem)
-  console.log('Stage rendered')
+  fetchVersion()
 }
 
 const Stage = () => {
