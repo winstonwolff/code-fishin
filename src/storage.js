@@ -9,7 +9,7 @@ console.debug('loading src/storage.js')
 
 
 import { initializeApp } from "firebase/app"
-import { getDatabase, ref, onValue, set } from "firebase/database"
+import { getDatabase, ref, onValue, set, remove } from "firebase/database"
 
 
 const firebaseConfig = {
@@ -28,11 +28,11 @@ const db = getDatabase(app);
 
 export const writePlayer = ( player ) => {
   // console.log('writePlayer playerId=', player.id)
-  set(ref(db,`players/${player.id}`), player)
+  set(ref(db, `players/${player.id}`), player)
 }
 
 export const removePlayer = ( player ) => {
-  remove(ref(db,`players/${player.id}`))
+  remove(ref(db, `players/${player.id}`))
 }
 
 // Register a callback when players change
@@ -44,3 +44,6 @@ export const listenPlayers = (callback) => {
   })
 }
 
+export const clearPlayers = () => {
+  remove( ref(db, 'players'))
+}

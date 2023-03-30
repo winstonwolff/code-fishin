@@ -12,7 +12,7 @@ import { Player } from './player.js'
 import { KeyTracker } from './keys.js'
 
 const r = React.createElement
-const MIN_FRAME_MILLIS = 30
+const MIN_FRAME_MILLIS = 33
 
 export const main = (stage_elem) => {
   ReactDOM.render(r(Game), stage_elem)
@@ -75,10 +75,20 @@ const Game = () => {
     setPlayers(playersList)
   }
 
+  const onResetGameBtn = event => {
+    storage.clearPlayers()
+  }
+
   return (
     r('div', {class: "Game"}, [
       r(Stage, {players}),
-      r('div', { class: 'debug-info' }, [
+      r('div', { class: 'button-bar' }, [
+        r('button',
+          { onClick: onResetGameBtn },
+          [ 'Reset Game' ]),
+      ]),
+      r('div',
+        { class: 'debug-info' }, [
         r('div', {}, [
           `frame millis: ${Math.floor(timing.current.lastDeltaMillis)}`,
         ]),
@@ -93,11 +103,13 @@ const Game = () => {
 const Stage = ({players}) => {
   // console.log('Stage called. players=', players)
   return (
-    r('div', {class: "Stage"}, [
-      r('svg', { xmlns:"http://www.w3.org/2000/svg",
-                 viewBox: `0 0 ${k.STAGE_WIDTH} ${k.STAGE_WIDTH}`,
-                 width: "400",
-                 height: "400" },
+    r('div',
+      {class: "Stage"}, [
+      r('svg',
+        { xmlns:"http://www.w3.org/2000/svg",
+          viewBox: `0 0 ${k.STAGE_WIDTH} ${k.STAGE_WIDTH}`,
+          width: "400",
+          height: "400" },
         players.map( player => r(PlayerView, {player}) )
       ),
     ])
