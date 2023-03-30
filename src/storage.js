@@ -31,6 +31,10 @@ export const writePlayer = ( player ) => {
   set(ref(db,`players/${player.id}`), player)
 }
 
+export const removePlayer = ( player ) => {
+  remove(ref(db,`players/${player.id}`))
+}
+
 // Register a callback when players change
 export const listenPlayers = (callback) => {
   onValue(ref(db, 'players/'), snapshot => {

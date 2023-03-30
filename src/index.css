@@ -1,3 +1,9 @@
-.Stage svg {
+.Game .Stage svg {
   border: 1px solid lightgray;
+}
+
+.Game .debug-info {
+  font-family: monaco;
+  font-size: 10px;
+  color: lightgray;
 }

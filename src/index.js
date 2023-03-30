@@ -39,7 +39,8 @@ const Game = () => {
   useEffect(setup, [])
 
   const shutdown = () => {
-    cancelAnimationFrame(animationHandle.current);
+    cancelAnimationFrame(animationHandle.current)
+    storage.removePlayer(mhyPlayer)
   }
 
   // This will be called roughly 60 fps
@@ -77,11 +78,13 @@ const Game = () => {
   return (
     r('div', {class: "Game"}, [
       r(Stage, {players}),
-      r('div', {}, [
-        `frame millis: ${Math.floor(timing.current.lastDeltaMillis)}`,
-      ]),
-      r('div', {}, [
-        `frame num: ${Math.floor(timing.current.frameNum)}`
+      r('div', { class: 'debug-info' }, [
+        r('div', {}, [
+          `frame millis: ${Math.floor(timing.current.lastDeltaMillis)}`,
+        ]),
+        r('div', { class: 'debug-info' }, [
+          `frame num: ${Math.floor(timing.current.frameNum)}`
+        ])
       ])
     ])
   )
