@@ -75,7 +75,7 @@ const Game = () => {
     setPlayers(playersList)
   }
 
-  const onResetGameBtn = event => {
+  const onClearPlayers = event => {
     storage.clearPlayers()
   }
 
@@ -84,8 +84,8 @@ const Game = () => {
       r(Stage, {players}),
       r('div', { class: 'button-bar' }, [
         r('button',
-          { onClick: onResetGameBtn },
-          [ 'Reset Game' ]),
+          { onClick: onClearPlayers },
+          [ 'Clear Stale Players' ]),
       ]),
       r('div',
         { class: 'debug-info' }, [
@@ -104,21 +104,30 @@ const Stage = ({players}) => {
   // console.log('Stage called. players=', players)
   return (
     r('div',
-      {class: "Stage"}, [
-      r('svg',
-        { xmlns:"http://www.w3.org/2000/svg",
-          viewBox: `0 0 ${k.STAGE_WIDTH} ${k.STAGE_WIDTH}`,
-          width: "400",
-          height: "400" },
-        players.map( player => r(PlayerView, {player}) )
-      ),
-    ])
+      {class: "Stage", autofocus: 1},
+      [
+        r('svg',
+          { xmlns:"http://www.w3.org/2000/svg",
+            viewBox: `0 0 ${k.STAGE_WIDTH} ${k.STAGE_WIDTH}`,
+            width: "400",
+            height: "400" },
+          players.map( player => r(PlayerView, {player}) )
+        ),
+      ]
+    )
   )
 }
 
 const PlayerView = ({player}) => {
-  return r('circle',
-    { cx: player.pos[X], cy: player.pos[Y], r:"20", fill: player.color }
+  return r('ellipse',
+    { rx: 30,
+      ry: 10,
+      fill: player.color,
+      transform: (
+        `translate(${Math.round(player.pos[X])} ${Math.round(player.pos[Y])}) `
+        + ` rotate(${Math.round(player.direction * k.RAD_TO_DEG)})`
+      )
+    }
   )
 }
 

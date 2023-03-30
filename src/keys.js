@@ -27,10 +27,12 @@ class KeyTracker {
   keyDownHandler(event) {
     // console.log('!!! keyCode=', event.keyCode)
     this._keys.add(event.keyCode)
+    event.preventDefault()
   }
 
   keyUpHandler(event) {
     this._keys.delete(event.keyCode)
+    event.preventDefault()
   }
 
   isPressed(keyCode) {
