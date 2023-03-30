@@ -39,7 +39,7 @@ export const removePlayer = ( player ) => {
 export const listenPlayers = (callback) => {
   onValue(ref(db, 'players/'), snapshot => {
     callback({
-      playersDict: snapshot.val()
+      playersDict: snapshot.val() || []
     })
   })
 }

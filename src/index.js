@@ -88,6 +88,15 @@ const Game = () => {
           [ 'Clear Stale Players' ]),
       ]),
       r('div',
+        { class: 'hack-panel' },
+        [
+          r('textarea',
+            { rows: 10 },
+            [ '# type JS here' ]
+          ),
+        ]
+      ),
+      r('div',
         { class: 'debug-info' }, [
         r('div', {}, [
           `frame millis: ${Math.floor(timing.current.lastDeltaMillis)}`,

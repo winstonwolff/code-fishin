@@ -7,3 +7,12 @@
   font-size: 10px;
   color: lightgray;
 }
+
+.Game .button-bar {
+  font-family: helvetica;
+  font-size: 12px;
+}
+.Game .hack-panel textarea {
+  border: 1px solid lightgray;
+  width: 100%;
+}
