@@ -9,11 +9,29 @@ import * as storage from './storage.js'
 import * as k from './constants.js'
 import { X, Y } from './constants.js'
 import { Player } from './player.js'
+import { KeyTracker, KEYCODES } from './keys.js'
 
 const r = React.createElement
 
 export const main = (stage_elem) => {
   ReactDOM.render(r(Game), stage_elem)
+}
+
+const keyTracker = new KeyTracker()
+
+const checkKeys = (player) => {
+  if (keyTracker.isPressed(KEYCODES.a) || keyTracker.isPressed(KEYCODES.LEFT)) {
+    console.log('turn left')
+  }
+  if (keyTracker.isPressed(KEYCODES.d) || keyTracker.isPressed(KEYCODES.RIGHT)) {
+    console.log('turn right')
+  }
+  if (keyTracker.isPressed(KEYCODES.w) || keyTracker.isPressed(KEYCODES.UP)) {
+    console.log('accelerate')
+  }
+  if (keyTracker.isPressed(KEYCODES.s) || keyTracker.isPressed(KEYCODES.DOWN)) {
+    console.log('deccelerate')
+  }
 }
 
 const Game = () => {
@@ -22,10 +40,10 @@ const Game = () => {
 
   // This will be called roughly 60 fps
   const animate = (time) => {
-    console.debug('tick...')
     requestAnimationFrame(animate)
+    checkKeys(myPlayer)
   }
-  // requestAnimationFrame(animate)
+  requestAnimationFrame(animate)
 
 
   const onPlayerChange = ({playersDict}) => {
@@ -37,6 +55,7 @@ const Game = () => {
   const setup = () => {
     storage.writePlayer(myPlayer)
     storage.listenPlayers(onPlayerChange)
+    keyTracker.listen(document)
   }
   useEffect(setup, [])
 
