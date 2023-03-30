@@ -2,16 +2,17 @@
 
 console.debug('loading src/index.js')
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import ReactDOM from 'react-dom'
 import icepick from 'icepick'
 import * as storage from './storage.js'
 import * as k from './constants.js'
 import { X, Y } from './constants.js'
 import { Player } from './player.js'
-import { KeyTracker, KEYCODES } from './keys.js'
+import { KeyTracker } from './keys.js'
 
 const r = React.createElement
+const MIN_FRAME_MILLIS = 30
 
 export const main = (stage_elem) => {
   ReactDOM.render(r(Game), stage_elem)
@@ -19,55 +20,74 @@ export const main = (stage_elem) => {
 
 const keyTracker = new KeyTracker()
 
-const checkKeys = (player) => {
-  if (keyTracker.isPressed(KEYCODES.a) || keyTracker.isPressed(KEYCODES.LEFT)) {
-    console.log('turn left')
-  }
-  if (keyTracker.isPressed(KEYCODES.d) || keyTracker.isPressed(KEYCODES.RIGHT)) {
-    console.log('turn right')
-  }
-  if (keyTracker.isPressed(KEYCODES.w) || keyTracker.isPressed(KEYCODES.UP)) {
-    console.log('accelerate')
-  }
-  if (keyTracker.isPressed(KEYCODES.s) || keyTracker.isPressed(KEYCODES.DOWN)) {
-    console.log('deccelerate')
-  }
-}
-
 const Game = () => {
+  const animationHandle = useRef(null)
+  const timing = useRef({
+    lastAnimationTime: 0.0,
+    lastDeltaMillis: 0.0,
+    frameNum: 0,
+  })
   const [myPlayer, setMyPlayer] = useState(Player.new())
   const [players, setPlayers] = useState([myPlayer])
-
-  // This will be called roughly 60 fps
-  const animate = (time) => {
-    requestAnimationFrame(animate)
-    checkKeys(myPlayer)
-  }
-  requestAnimationFrame(animate)
-
-
-  const onPlayerChange = ({playersDict}) => {
-    const playersList = Object.values(playersDict)
-    console.log('onPlayerchange players=', playersList)
-    setPlayers(playersList)
-  }
 
   const setup = () => {
     storage.writePlayer(myPlayer)
     storage.listenPlayers(onPlayerChange)
     keyTracker.listen(document)
+    return shutdown
   }
   useEffect(setup, [])
+
+  const shutdown = () => {
+    cancelAnimationFrame(animationHandle.current);
+  }
+
+  // This will be called roughly 60 fps
+  const animate = (timeMillis) => {
+    const timeDeltaMillis = (timeMillis - timing.current.lastAnimationTime)
+    animationHandle.current = requestAnimationFrame(animate)
+    if (timeDeltaMillis < MIN_FRAME_MILLIS) return
+    timing.current = {
+      lastAnimationTime: timeMillis,
+      lastDeltaMillis: timeDeltaMillis,
+      frameNum: timing.current.frameNum + 1,
+    }
+
+    setMyPlayer(updatePlayer(timeDeltaMillis))
+  }
+  animate(0.0)
+
+  const updatePlayer = (timeDeltaMillis) => (oldPlayer) => {
+    let newPlayer = oldPlayer
+    // newPlayer = Player.checkKeys(newPlayer, keyTracker)
+    newPlayer = Player.think(newPlayer, timeDeltaMillis / 1000.0)
+
+    storage.writePlayer(newPlayer)
+    return newPlayer
+  }
+
+
+  const onPlayerChange = ({playersDict}) => {
+    const playersList = Object.values(playersDict)
+    // console.log('onPlayerchange players=', playersList)
+    setPlayers(playersList)
+  }
 
   return (
     r('div', {class: "Game"}, [
       r(Stage, {players}),
+      r('div', {}, [
+        `frame millis: ${Math.floor(timing.current.lastDeltaMillis)}`,
+      ]),
+      r('div', {}, [
+        `frame num: ${Math.floor(timing.current.frameNum)}`
+      ])
     ])
   )
 }
 
 const Stage = ({players}) => {
-  console.log('Stage called. players=', players)
+  // console.log('Stage called. players=', players)
   return (
     r('div', {class: "Stage"}, [
       r('svg', { xmlns:"http://www.w3.org/2000/svg",
@@ -75,7 +95,7 @@ const Stage = ({players}) => {
                  width: "400",
                  height: "400" },
         players.map( player => r(PlayerView, {player}) )
-      )
+      ),
     ])
   )
 }

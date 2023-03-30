@@ -27,7 +27,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 export const writePlayer = ( player ) => {
-  console.log('writePlayer playerId=', player.id)
+  // console.log('writePlayer playerId=', player.id)
   set(ref(db,`players/${player.id}`), player)
 }
 

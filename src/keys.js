@@ -11,11 +11,10 @@ export const KEYCODES = {
 
 class KeyTracker {
   constructor() {
-    this._keys = {}
+    this._keys = new Set()
   }
 
   listen(document) {
-    console.log('!!! listening')
     document.addEventListener("keydown", this.keyDownHandler.bind(this), false)
     document.addEventListener("keyup", this.keyUpHandler.bind(this), false)
   }
@@ -27,15 +26,15 @@ class KeyTracker {
 
   keyDownHandler(event) {
     // console.log('!!! keyCode=', event.keyCode)
-    this._keys[event.keyCode] = true
+    this._keys.add(event.keyCode)
   }
 
   keyUpHandler(event) {
-    this._keys[event.keyCode] = false
+    this._keys.delete(event.keyCode)
   }
 
   isPressed(keyCode) {
-    return this._keys[keyCode]
+    return this._keys.has(keyCode)
   }
 }
 
