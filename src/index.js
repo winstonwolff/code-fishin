@@ -58,9 +58,10 @@ const Game = () => {
   animate(0.0)
 
   const updatePlayer = (timeDeltaMillis) => (oldPlayer) => {
+    const timeDeltaSec = timeDeltaMillis / 1000.0
     let newPlayer = oldPlayer
-    // newPlayer = Player.checkKeys(newPlayer, keyTracker)
-    newPlayer = Player.think(newPlayer, timeDeltaMillis / 1000.0)
+    newPlayer = Player.checkKeys(newPlayer, timeDeltaSec, keyTracker)
+    newPlayer = Player.think(newPlayer, timeDeltaSec)
 
     storage.writePlayer(newPlayer)
     return newPlayer
