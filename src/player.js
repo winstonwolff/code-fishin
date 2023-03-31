@@ -26,27 +26,33 @@ export const Player = {
 
   checkKeys: (player, timeDeltaSec, keyTracker) => {
     let newPlayer = player
-    if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
-      // turn left
-      newPlayer = icepick.assoc(newPlayer, 'direction',
-        newPlayer.direction - ROT_PER_SEC * timeDeltaSec)
-    }
-    if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
-      // turn right
-      newPlayer = icepick.assoc(newPlayer, 'direction',
-        newPlayer.direction + ROT_PER_SEC * timeDeltaSec)
-    }
+    // if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
+    //   newPlayer = Player.rudderStarboard(newPlayer, timeDeltaSec)
+    // }
+    // if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
+    //   newPlayer = Player.rudderPort(newPlayer, timeDeltaSec)
+    // }
     if (keyTracker.isPressed('w') || keyTracker.isPressed('ArrowUp')) {
       // accelerate
       newPlayer = icepick.assoc(newPlayer, 'speed',
         newPlayer.speed + ACC_PER_SEC * timeDeltaSec)
     }
     if (keyTracker.isPressed('s') || keyTracker.isPressed('ArrowDown')) {
-      // deccelerate
+      // decelerate
       newPlayer = icepick.assoc(newPlayer, 'speed',
         newPlayer.speed - ACC_PER_SEC * timeDeltaSec)
     }
     return newPlayer
+  },
+
+  rudderPort: (player, timeDeltaSec) => {
+      return icepick.assoc(player, 'direction',
+        player.direction - ROT_PER_SEC * timeDeltaSec)
+  },
+
+  rudderStarboard: (player, timeDeltaSec) => {
+      return icepick.assoc(player, 'direction',
+        player.direction + ROT_PER_SEC * timeDeltaSec)
   },
 
   think: (player, timeDeltaSec) => {

@@ -4,15 +4,10 @@ class KeyTracker {
     this._keys = new Set()
   }
 
-  listen(document) {
-    document.addEventListener("keydown", this.keyDownHandler.bind(this), false)
-    document.addEventListener("keyup", this.keyUpHandler.bind(this), false)
+  listen(dom_element) {
+    dom_element.addEventListener("keydown", this.keyDownHandler.bind(this), false)
+    dom_element.addEventListener("keyup", this.keyUpHandler.bind(this), false)
   }
-
-  // unListen(document) {
-  //   document.removeEventListener("keydown", this.keyDownHandler, false)
-  //   document.removeEventListener("keyup", this.keyUpHandler, false)
-  // }
 
   keyDownHandler(event) {
     // console.log('!!! keyCode=', event.keyCode, 'key=', event.key, 'code=', event.code)
