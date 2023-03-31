@@ -16,3 +16,7 @@
   border: 1px solid lightgray;
   width: 100%;
 }
+
+.Stage svg {
+  background-color: #d2eeea;
+}

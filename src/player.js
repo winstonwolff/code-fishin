@@ -1,15 +1,17 @@
 import * as k from './constants.js'
 import { X, Y } from './constants.js'
 import * as random from './random.js'
-import { KEYCODES } from './keys.js'
 import icepick from 'icepick'
 
+//
+//      Player
+//
 const COLORS = [
   'blue', '#4E9258', '#6CBB3C', '#B2C248', '#EDE275', '#FFA62F',
   '#CD7F32', '#835C3B', '#C47451', '#C35817', '#F62817',
 ]
 const ROT_PER_SEC = 1
-const ACC_PER_SEC = 10
+const ACC_PER_SEC = 20
 export const Player = {
   new: () => {
     return {
@@ -24,22 +26,22 @@ export const Player = {
 
   checkKeys: (player, timeDeltaSec, keyTracker) => {
     let newPlayer = player
-    if (keyTracker.isPressed(KEYCODES.a) || keyTracker.isPressed(KEYCODES.LEFT)) {
+    if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
       // turn left
       newPlayer = icepick.assoc(newPlayer, 'direction',
         newPlayer.direction - ROT_PER_SEC * timeDeltaSec)
     }
-    if (keyTracker.isPressed(KEYCODES.d) || keyTracker.isPressed(KEYCODES.RIGHT)) {
+    if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
       // turn right
       newPlayer = icepick.assoc(newPlayer, 'direction',
         newPlayer.direction + ROT_PER_SEC * timeDeltaSec)
     }
-    if (keyTracker.isPressed(KEYCODES.w) || keyTracker.isPressed(KEYCODES.UP)) {
+    if (keyTracker.isPressed('w') || keyTracker.isPressed('ArrowUp')) {
       // accelerate
       newPlayer = icepick.assoc(newPlayer, 'speed',
         newPlayer.speed + ACC_PER_SEC * timeDeltaSec)
     }
-    if (keyTracker.isPressed(KEYCODES.s) || keyTracker.isPressed(KEYCODES.DOWN)) {
+    if (keyTracker.isPressed('s') || keyTracker.isPressed('ArrowDown')) {
       // deccelerate
       newPlayer = icepick.assoc(newPlayer, 'speed',
         newPlayer.speed - ACC_PER_SEC * timeDeltaSec)

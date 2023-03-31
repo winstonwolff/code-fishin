@@ -1,13 +1,3 @@
-export const KEYCODES = {
-  a: 65,
-  s: 83,
-  d: 68,
-  w: 87,
-  LEFT: 37,
-  UP: 38,
-  RIGHT: 39,
-  DOWN: 40,
-}
 
 class KeyTracker {
   constructor() {
@@ -25,18 +15,20 @@ class KeyTracker {
   // }
 
   keyDownHandler(event) {
-    // console.log('!!! keyCode=', event.keyCode)
-    this._keys.add(event.keyCode)
+    // console.log('!!! keyCode=', event.keyCode, 'key=', event.key, 'code=', event.code)
+    this._keys.add(event.key)
     event.preventDefault()
   }
 
   keyUpHandler(event) {
-    this._keys.delete(event.keyCode)
+    this._keys.delete(event.key)
     event.preventDefault()
   }
 
-  isPressed(keyCode) {
-    return this._keys.has(keyCode)
+  // Return if 'key' is pressed, where 'key' is either the lower case letter
+  // like "a" or "1", or the special keys name such as "ArrowLeft" or "Shift"
+  isPressed(key) {
+    return this._keys.has(key)
   }
 }
 
