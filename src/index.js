@@ -2,7 +2,7 @@
 
 console.debug('loading src/index.js')
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useReducer } from "react"
 import ReactDOM from 'react-dom'
 import icepick from 'icepick'
 import * as storage from './storage.js'
@@ -10,9 +10,11 @@ import * as k from './constants.js'
 import { X, Y } from './constants.js'
 import { Player } from './player.js'
 import { KeyTracker } from './keys.js'
+import { evalPlayerScript } from './playerScript.js'
+import { useAnimationFrame } from './useAnimationFrame.js'
 
 const r = React.createElement
-const MIN_FRAME_MILLIS = 33
+const MIN_FRAME_MILLIS = 330
 
 export const main = (stage_elem) => {
   ReactDOM.render(r(Game), stage_elem)
@@ -20,59 +22,73 @@ export const main = (stage_elem) => {
 
 const keyTracker = new KeyTracker()
 
-const Game = () => {
-  const animationHandle = useRef(null)
-  const timing = useRef({
-    lastAnimationTime: 0.0,
-    lastDeltaMillis: 0.0,
-    frameNum: 0,
+const onAnimationFrame = mergeState => timeDeltaMillis => {
+  const timeDeltaSec = timeDeltaMillis / 1000.0
+
+  mergeState( oldState => {
+    let newPlayer = oldState.myPlayer
+    newPlayer = Player.checkKeys(newPlayer, timeDeltaSec, keyTracker)
+    newPlayer = Player.think(newPlayer, timeDeltaSec)
+    // const actions = evalPlayerScript({ timeDeltaSec, keyTracker, script: oldState.script })
+    // newPlayer = actions.reduce(
+    //   (player, actionFunc) => actionFunc(player),
+    //   newPlayer
+    // )
+
+    storage.writePlayer(newPlayer)
+
+    const stateChanges = {
+      frameDeltaMillis: timeDeltaMillis,
+      myPlayer: newPlayer,
+    }
+    return stateChanges
   })
-  const [myPlayer, setMyPlayer] = useState(Player.new())
-  const [players, setPlayers] = useState([myPlayer])
+}
+
+const Game = () => {
+  //
+  //    Refs
+  //
+  // const animationHandle = useRef(null)
+  const stageRef = useRef(null)
+
+  //
+  //    State
+  //
+  const initialState = () => {
+    const myPlayer = Player.new()
+    return {
+      frameDeltaMillis: 0,
+      myPlayer,
+      players: [myPlayer],
+      script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
+            + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n'
+    }
+  }
+  const mergeStateChanges = (oldState, mergeFunc) => ({...oldState, ...mergeFunc(oldState)})
+  const [state, mergeState] = useReducer(mergeStateChanges, null, initialState)
+
+  // Animation
+  useAnimationFrame( onAnimationFrame(mergeState), MIN_FRAME_MILLIS )
 
   const setup = () => {
-    storage.writePlayer(myPlayer)
+    storage.writePlayer(state.myPlayer)
     storage.listenPlayers(onPlayerChange)
-    keyTracker.listen(document)
+    setTimeout(
+      () => keyTracker.listen(stageRef.current),
+      10)
     return shutdown
   }
   useEffect(setup, [])
 
   const shutdown = () => {
-    cancelAnimationFrame(animationHandle.current)
     storage.removePlayer(mhyPlayer)
   }
-
-  // This will be called roughly 60 fps
-  const animate = (timeMillis) => {
-    const timeDeltaMillis = (timeMillis - timing.current.lastAnimationTime)
-    animationHandle.current = requestAnimationFrame(animate)
-    if (timeDeltaMillis < MIN_FRAME_MILLIS) return
-    timing.current = {
-      lastAnimationTime: timeMillis,
-      lastDeltaMillis: timeDeltaMillis,
-      frameNum: timing.current.frameNum + 1,
-    }
-
-    setMyPlayer(updatePlayer(timeDeltaMillis))
-  }
-  animate(0.0)
-
-  const updatePlayer = (timeDeltaMillis) => (oldPlayer) => {
-    const timeDeltaSec = timeDeltaMillis / 1000.0
-    let newPlayer = oldPlayer
-    newPlayer = Player.checkKeys(newPlayer, timeDeltaSec, keyTracker)
-    newPlayer = Player.think(newPlayer, timeDeltaSec)
-
-    storage.writePlayer(newPlayer)
-    return newPlayer
-  }
-
 
   const onPlayerChange = ({playersDict}) => {
     const playersList = Object.values(playersDict)
     // console.log('onPlayerchange players=', playersList)
-    setPlayers(playersList)
+    mergeState( () => ({ players: playersList }))
   }
 
   const onClearPlayers = event => {
@@ -81,7 +97,7 @@ const Game = () => {
 
   return (
     r('div', {class: "Game"}, [
-      r(Stage, {players}),
+      r(Stage, { players: state.players, ref: stageRef }),
       r('div', { class: 'button-bar' }, [
         r('button',
           { onClick: onClearPlayers },
@@ -91,29 +107,28 @@ const Game = () => {
         { class: 'hack-panel' },
         [
           r('textarea',
-            { rows: 10 },
-            [ '# type JS here' ]
+            { rows: 10,
+              value: state.script,
+              onChange: event => mergeState( () => ({ script: event.target.value }))
+            }
           ),
         ]
       ),
       r('div',
         { class: 'debug-info' }, [
         r('div', {}, [
-          `frame millis: ${Math.floor(timing.current.lastDeltaMillis)}`,
+          `frame millis: ${Math.floor(state.frameDeltaMillis)}`,
         ]),
-        r('div', { class: 'debug-info' }, [
-          `frame num: ${Math.floor(timing.current.frameNum)}`
-        ])
       ])
     ])
   )
 }
 
-const Stage = ({players}) => {
+const Stage = React.forwardRef(({players}, ref) => {
   // console.log('Stage called. players=', players)
   return (
     r('div',
-      {class: "Stage", autofocus: 1},
+      {class: "Stage", tabIndex: -1, autofocus: 1, ref},
       [
         r('svg',
           { xmlns:"http://www.w3.org/2000/svg",
@@ -126,7 +141,7 @@ const Stage = ({players}) => {
       ]
     )
   )
-}
+})
 
 const PlayerView = ({player}) => {
   return r('ellipse',

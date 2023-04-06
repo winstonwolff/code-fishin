@@ -18,7 +18,7 @@ export const Player = {
       id: random.uniqueId(),
       pos: [ random.randRange(0, k.STAGE_WIDTH),
              random.randRange(0, k.STAGE_WIDTH)],
-      direction: random.randRange(0, k.TAU), // in radians 0..6.28
+      direction: random.randRange(0, k.TAU), // in radians 0..6.t8
       speed: 25.0, // stage-units/sec
       color: random.choice(COLORS),
     }
@@ -26,12 +26,12 @@ export const Player = {
 
   checkKeys: (player, timeDeltaSec, keyTracker) => {
     let newPlayer = player
-    // if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
-    //   newPlayer = Player.rudderStarboard(newPlayer, timeDeltaSec)
-    // }
-    // if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
-    //   newPlayer = Player.rudderPort(newPlayer, timeDeltaSec)
-    // }
+    if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
+      newPlayer = Player.rudderStarboard(newPlayer, timeDeltaSec)
+    }
+    if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
+      newPlayer = Player.rudderPort(newPlayer, timeDeltaSec)
+    }
     if (keyTracker.isPressed('w') || keyTracker.isPressed('ArrowUp')) {
       // accelerate
       newPlayer = icepick.assoc(newPlayer, 'speed',
