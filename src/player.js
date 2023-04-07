@@ -26,12 +26,12 @@ export const Player = {
 
   checkKeys: (player, timeDeltaSec, keyTracker) => {
     let newPlayer = player
-    if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
-      newPlayer = Player.rudderStarboard(newPlayer, timeDeltaSec)
-    }
-    if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
-      newPlayer = Player.rudderPort(newPlayer, timeDeltaSec)
-    }
+    // if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
+    //   newPlayer = Player.rudderStarboard(newPlayer, timeDeltaSec)
+    // }
+    // if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
+    //   newPlayer = Player.rudderPort(newPlayer, timeDeltaSec)
+    // }
     if (keyTracker.isPressed('w') || keyTracker.isPressed('ArrowUp')) {
       // accelerate
       newPlayer = icepick.assoc(newPlayer, 'speed',

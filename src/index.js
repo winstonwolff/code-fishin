@@ -14,7 +14,7 @@ import { evalPlayerScript } from './playerScript.js'
 import { useAnimationFrame } from './useAnimationFrame.js'
 
 const r = React.createElement
-const MIN_FRAME_MILLIS = 330
+const MIN_FRAME_MILLIS = 33
 
 export const main = (stage_elem) => {
   ReactDOM.render(r(Game), stage_elem)
@@ -29,11 +29,11 @@ const onAnimationFrame = mergeState => timeDeltaMillis => {
     let newPlayer = oldState.myPlayer
     newPlayer = Player.checkKeys(newPlayer, timeDeltaSec, keyTracker)
     newPlayer = Player.think(newPlayer, timeDeltaSec)
-    // const actions = evalPlayerScript({ timeDeltaSec, keyTracker, script: oldState.script })
-    // newPlayer = actions.reduce(
-    //   (player, actionFunc) => actionFunc(player),
-    //   newPlayer
-    // )
+    const actions = evalPlayerScript({ timeDeltaSec, keyTracker, script: oldState.script })
+    newPlayer = actions.reduce(
+      (player, actionFunc) => actionFunc(player),
+      newPlayer
+    )
 
     storage.writePlayer(newPlayer)
 
