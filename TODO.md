@@ -1,7 +1,6 @@
 To Do
 =====
 
-- doesn't load on safari
 - Gracefully handles errors in Player code
 - Player programs keys
     when Launched: shipColor('#FF3388')

@@ -7,7 +7,7 @@ import { Player } from './player.js'
     Those actions will be functions that take 'player' and return a modified Player
  */
 export const evalPlayerScript = ({timeDeltaSec, script, keyTracker}) => {
-  const actions = []
+  let actions = []
   const isKeyPressed = key => keyTracker.isPressed(key)
   const rudderPort = () => {
     actions.push( player => Player.rudderPort(player, timeDeltaSec) )
@@ -20,7 +20,12 @@ export const evalPlayerScript = ({timeDeltaSec, script, keyTracker}) => {
   const scriptContainer = ({ isKeyPressed, rudderPort, rudderStarboard }) => {
     eval(script)
   }
-  scriptContainer({ isKeyPressed, rudderPort, rudderStarboard })
+  try {
+    scriptContainer({ isKeyPressed, rudderPort, rudderStarboard })
+  } catch(e) {
+    actions = []
+    console.error('evalPlayerScript:', e)
+  }
 
   return actions
 }
