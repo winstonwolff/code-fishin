@@ -12,6 +12,7 @@ import { Player } from './player.js'
 import { KeyTracker } from './keys.js'
 import { evalPlayerScript } from './playerScript.js'
 import { useAnimationFrame } from './useAnimationFrame.js'
+import { initialState } from './state.js'
 
 const r = React.createElement
 const MIN_FRAME_MILLIS = 33
@@ -22,16 +23,20 @@ export const main = (stage_elem) => {
 
 const keyTracker = new KeyTracker()
 
-const onAnimationFrame = mergeState => timeDeltaMillis => {
+const onAnimationFrame = updateState => timeDeltaMillis => {
   const timeDeltaSec = timeDeltaMillis / 1000.0
 
-  mergeState( oldState => {
+  updateState( oldState => {
     let newPlayer = oldState.myPlayer
+
+    // Run all the playerUpdate funcs
     newPlayer = Player.checkKeys(newPlayer, timeDeltaSec, keyTracker)
     newPlayer = Player.think(newPlayer, timeDeltaSec)
-    const actions = evalPlayerScript({ timeDeltaSec, keyTracker, script: oldState.script })
-    newPlayer = actions.reduce(
-      (player, actionFunc) => actionFunc(player),
+
+    // Including the user's playerUpdates
+    const playerUpdates = evalPlayerScript({ timeDeltaSec, keyTracker, script: oldState.script })
+    newPlayer = playerUpdates.reduce(
+      ((oldPlayer, playerUpdate) => playerUpdate(oldPlayer)),
       newPlayer
     )
 
@@ -55,21 +60,15 @@ const Game = () => {
   //
   //    State
   //
-  const initialState = () => {
-    const myPlayer = Player.new()
-    return {
-      frameDeltaMillis: 0,
-      myPlayer,
-      players: [myPlayer],
-      script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
-            + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n'
-    }
-  }
-  const mergeStateChanges = (oldState, mergeFunc) => ({...oldState, ...mergeFunc(oldState)})
-  const [state, mergeState] = useReducer(mergeStateChanges, null, initialState)
+  //    'updateState' takes a function which modifies state. E.g.:
+  //      updateState( oldState => ({...oldState, newValue: 999}))
+  const [state, updateState] = useReducer(
+    ((oldState, mergeFunc) => ({...oldState, ...mergeFunc(oldState)})),
+    null,
+    initialState)
 
   // Animation
-  useAnimationFrame( onAnimationFrame(mergeState), MIN_FRAME_MILLIS )
+  useAnimationFrame( onAnimationFrame(updateState), MIN_FRAME_MILLIS )
 
   const setup = () => {
     storage.writePlayer(state.myPlayer)
@@ -88,7 +87,7 @@ const Game = () => {
   const onPlayerChange = ({playersDict}) => {
     const playersList = Object.values(playersDict)
     // console.log('onPlayerchange players=', playersList)
-    mergeState( () => ({ players: playersList }))
+    updateState( () => ({ players: playersList }))
   }
 
   const onClearPlayers = event => {
@@ -109,7 +108,7 @@ const Game = () => {
           r('textarea',
             { rows: 10,
               value: state.script,
-              onChange: event => mergeState( () => ({ script: event.target.value }))
+              onChange: event => updateState( () => ({ script: event.target.value }))
             }
           ),
         ]
