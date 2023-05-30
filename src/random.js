@@ -12,6 +12,14 @@ export const clamp = (value, min, max) => {
     return Math.min(Math.max(value, min), max)
 }
 
+// Return 'value' but limited to min..max
+export const wrap = (value, min, max) => {
+  const delta = Math.abs(max - min)
+  let v = value - min
+  v = (value + delta) % delta
+  return v + min
+}
+
 // Return a random floating point number between `low` and `high`
 export const randRange = (low, high) => {
   const delta = high - low

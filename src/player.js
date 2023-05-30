@@ -59,8 +59,10 @@ export const Player = {
     const deltaX = Math.cos(player.direction) * player.speed * timeDeltaSec
     const deltaY = Math.sin(player.direction) * player.speed * timeDeltaSec
     let newPlayer = icepick.assoc(player, 'pos', [
-      random.clamp(player.pos[X] + deltaX, 0, k.STAGE_WIDTH),
-      random.clamp(player.pos[Y] + deltaY, 0, k.STAGE_WIDTH)
+      random.wrap(player.pos[X] + deltaX, 0, k.STAGE_WIDTH),
+      random.wrap(player.pos[Y] + deltaY, 0, k.STAGE_WIDTH)
+      // random.clamp(player.pos[X] + deltaX, 0, k.STAGE_WIDTH),
+      // random.clamp(player.pos[Y] + deltaY, 0, k.STAGE_WIDTH)
     ])
     return newPlayer
   },
