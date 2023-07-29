@@ -13,16 +13,18 @@ import { KeyTracker } from './keys.js'
 import { evalPlayerScript } from './playerScript.js'
 import { useAnimationFrame } from './useAnimationFrame.js'
 import { initialState } from './state.js'
+import { UserConsole } from './UserConsole.js'
 
 const r = React.createElement
 const MIN_FRAME_MILLIS = 33
 
-export const main = (stage_elem) => {
-  ReactDOM.render(r(Game), stage_elem)
+export const main = (arena_elem) => {
+  ReactDOM.render(r(TheApp), arena_elem)
 }
 
 const keyTracker = new KeyTracker()
 
+// handle updating things in the game
 const onAnimationFrame = updateState => timeDeltaMillis => {
   const timeDeltaSec = timeDeltaMillis / 1000.0
 
@@ -34,7 +36,7 @@ const onAnimationFrame = updateState => timeDeltaMillis => {
     newPlayer = Player.think(newPlayer, timeDeltaSec)
 
     // Including the user's playerUpdates
-    const playerUpdates = evalPlayerScript({ timeDeltaSec, keyTracker, script: oldState.script })
+    const playerUpdates = evalPlayerScript({timeDeltaSec, keyTracker, script: oldState.script, updateState })
     newPlayer = playerUpdates.reduce(
       ((oldPlayer, playerUpdate) => playerUpdate(oldPlayer)),
       newPlayer
@@ -50,18 +52,23 @@ const onAnimationFrame = updateState => timeDeltaMillis => {
   })
 }
 
-const Game = () => {
+
+// The game
+const TheApp = () => {
   //
   //    Refs
   //
   // const animationHandle = useRef(null)
-  const stageRef = useRef(null)
+  const arenaRef = useRef(null)
 
   //
   //    State
   //
   //    'updateState' takes a function which modifies state. E.g.:
   //      updateState( oldState => ({...oldState, newValue: 999}))
+  //    your mutation function's return value will be merged into 'oldState'
+  //    so you can just return the parts you care about.
+  //
   const [state, updateState] = useReducer(
     ((oldState, mergeFunc) => ({...oldState, ...mergeFunc(oldState)})),
     null,
@@ -74,7 +81,7 @@ const Game = () => {
     storage.writePlayer(state.myPlayer)
     storage.listenPlayers(onPlayerChange)
     setTimeout(
-      () => keyTracker.listen(stageRef.current),
+      () => keyTracker.listen(arenaRef.current),
       10)
     return shutdown
   }
@@ -95,24 +102,19 @@ const Game = () => {
   }
 
   return (
-    r('div', {class: "Game"}, [
-      r(Stage, { players: state.players, ref: stageRef }),
+    r('div', {class: "TheApp"}, [
+      r(Arena, { players: state.players, ref: arenaRef }, [
+        r(UserConsole, {messages: state.consoleMessages}),
+      ]),
       r('div', { class: 'button-bar' }, [
         r('button',
           { onClick: onClearPlayers },
           [ 'Clear Stale Players' ]),
       ]),
-      r('div',
-        { class: 'hack-panel' },
-        [
-          r('textarea',
-            { rows: 10,
-              value: state.script,
-              onChange: event => updateState( () => ({ script: event.target.value }))
-            }
-          ),
-        ]
-      ),
+      r(ScriptEditor, {
+        script: state.script,
+        onChange: event => updateState( () => ({ script: event.target.value })),
+      }),
       r('div',
         { class: 'debug-info' }, [
         r('div', {}, [
@@ -123,25 +125,30 @@ const Game = () => {
   )
 }
 
-const Stage = React.forwardRef(({players}, ref) => {
-  // console.log('Stage called. players=', players)
+
+// The sea where the player's ship and other ships appear
+const Arena = React.forwardRef(({players, children}, ref) => {
+  // console.log('Arena called. players=', players)
   return (
     r('div',
-      {class: "Stage", tabIndex: -1, autofocus: 1, ref},
+      {class: "Arena", tabIndex: 0, autofocus: 1, ref},
       [
         r('svg',
           { xmlns:"http://www.w3.org/2000/svg",
-            viewBox: `0 0 ${k.STAGE_WIDTH} ${k.STAGE_WIDTH}`,
+            viewBox: `0 0 ${k.ARENA_WIDTH} ${k.ARENA_WIDTH}`,
             width: "400",
             height: "400",
           },
           players.map( player => r(PlayerView, {player}) )
         ),
+        ...children,
       ]
     )
   )
 })
 
+
+// The player's ship
 const PlayerView = ({player}) => {
   return r('ellipse',
     { rx: 30,
@@ -155,3 +162,25 @@ const PlayerView = ({player}) => {
   )
 }
 
+
+
+const ScriptEditor = ({script, onChange}) => {
+
+  return (
+    r('div',
+      { class: 'ScriptEditor hack-panel' },
+      [
+        r('textarea',
+          { rows: 10,
+            value: script,
+            onChange: onChange,
+            autocomplete: "off",
+            autocorrect: "off",
+            autocapitalize: "off",
+            spellcheck: "false",
+          }
+        ),
+      ]
+    )
+  )
+}

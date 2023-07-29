@@ -1,4 +1,5 @@
 import { Player } from './player.js'
+import { INIT_USER_CONSOLE } from './UserConsole.js'
 
 export const initialState = () => {
   const myPlayer = Player.new()
@@ -9,7 +10,7 @@ export const initialState = () => {
     players: [myPlayer],
     script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
           + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n',
-    scriptErrors: [],
+    ...INIT_USER_CONSOLE,
   }
 }
 
