@@ -3,6 +3,10 @@
 import { Player } from './player.js'
 import { updateConsole } from './UserConsole.js'
 
+export const INIT_PLAYER_SCRIPT = {
+  // playerScript: last
+}
+
 /*
     Execute user's script, returning a list of 'updatePlayer' functions the user has
     called.  Those functions take 'player' and return a modified Player
