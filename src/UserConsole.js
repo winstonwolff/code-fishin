@@ -1,4 +1,4 @@
-import React from "react"
+import { createElement as r } from "react"
 
 
 export class ConsoleMessages {
@@ -25,8 +25,6 @@ export class ConsoleMessages {
     )
   }
 }
-
-const r = React.createElement
 
 // Display ConsoleMessages, overlaid on Arena
 export const UserConsole = ({consoleMessages, updateState}) => {

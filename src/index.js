@@ -2,7 +2,7 @@
 
 console.debug('loading src/index.js')
 
-import React, { useState, useEffect, useRef, useReducer } from "react"
+import React, { useState, useEffect, useRef, useReducer, createElement as r } from "react"
 import ReactDOM from 'react-dom'
 import icepick from 'icepick'
 import * as storage from './storage.js'
@@ -15,7 +15,6 @@ import { useAnimationFrame } from './useAnimationFrame.js'
 import { initialState } from './state.js'
 import { UserConsole } from './UserConsole.js'
 
-const r = React.createElement
 const MIN_FRAME_MILLIS = 33
 
 export const main = (arena_elem) => {

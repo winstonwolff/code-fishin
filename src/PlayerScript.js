@@ -1,10 +1,8 @@
 'use strict'
 
-import React, { useState, useEffect, useRef, useReducer } from "react"
+import { createElement as r } from "react"
 import { Player } from './Player.js'
 import { ConsoleMessages } from './UserConsole.js'
-
-const r = React.createElement
 
 
 export class PlayerScript {
@@ -16,6 +14,17 @@ export class PlayerScript {
       scriptHash: 0,
       lastEval: 0,
     }
+  }
+
+  // Change state with the new user's script
+  static update(newScript, updateState) {
+    updateState( (oldState) => ({
+      playerScript: {
+        script: newScript,
+        scriptHash: hashCode(newScript),
+        lastEval: oldState.playerScript.lastEval,
+      }
+    }))
   }
 
   /*
@@ -62,19 +71,10 @@ export class PlayerScript {
 
     return playerUpdates
   }
-
-  // Update state with the new user's script
-  static update(newScript, updateState) {
-    updateState( (oldState) => ({
-      playerScript: {
-        script: newScript,
-        scriptHash: hashCode(newScript),
-        lastEval: oldState.playerScript.lastEval,
-      }
-    }))
-  }
 }
 
+
+// React view to show and edit the player's script
 export const ScriptEditor = ({playerScript, updateState}) => {
 
   return (
