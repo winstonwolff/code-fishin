@@ -104,7 +104,7 @@ const TheApp = () => {
   return (
     r('div', {class: "TheApp"}, [
       r(Arena, { players: state.players, ref: arenaRef }, [
-        r(UserConsole, {messages: state.consoleMessages}),
+        r(UserConsole, {consoleMessages: state.consoleMessages, updateState}),
       ]),
       r('div', { class: 'button-bar' }, [
         r('button',
