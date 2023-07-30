@@ -10,6 +10,8 @@ export const INIT_PLAYER_SCRIPT = {
   playerScript: {
     script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
             + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n',
+    scriptHash: 0,
+    lastEval: 0,
   }
 }
 
@@ -41,17 +43,29 @@ export const evalPlayerScript = ({timeDeltaSec, playerScript, keyTracker, update
     scriptContainer({ isKeyPressed, rudderPort, rudderStarboard })
   } catch(e) {
     playerUpdates = []
-    console.error('evalPlayerScript:', e)
-    updateConsole( e, updateState )
+    if (playerScript.lastEval !== playerScript.scriptHash) {
+      console.error('evalPlayerScript:', e)
+      updateConsole( e, updateState )
+
+      // Remember that we've already shown error for this version of script
+      updateState( oldState => ({
+        playerScript: {
+          ...oldState.playerScript,
+          lastEval: oldState.playerScript.scriptHash,
+        }
+      }))
+    }
   }
 
   return playerUpdates
 }
 
 const updatePlayerScript = (newScript, updateState) => {
-  updateState( () => ({
+  updateState( (oldState) => ({
     playerScript: {
-      script: newScript
+      script: newScript,
+      scriptHash: hashCode(newScript),
+      lastEval: oldState.playerScript.lastEval,
     }
   }))
 }
@@ -75,4 +89,13 @@ export const ScriptEditor = ({playerScript, updateState}) => {
       ]
     )
   )
+}
+
+// Returns 32 bit hash of a string. Not as good as MD5 or SHA-*
+// see https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+const hashCode = str => {
+  return str.split("").reduce(function(a, b) {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0)
 }
