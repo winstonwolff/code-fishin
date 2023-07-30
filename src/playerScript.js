@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useReducer } from "react"
 import { Player } from './player.js'
-import { updateConsole } from './UserConsole.js'
+import { ConsoleMessages } from './UserConsole.js'
 
 const r = React.createElement
 
@@ -45,7 +45,7 @@ export const evalPlayerScript = ({timeDeltaSec, playerScript, keyTracker, update
     playerUpdates = []
     if (playerScript.lastEval !== playerScript.scriptHash) {
       console.error('evalPlayerScript:', e)
-      updateConsole( e, updateState )
+      ConsoleMessages.print( e, updateState )
 
       // Remember that we've already shown error for this version of script
       updateState( oldState => ({

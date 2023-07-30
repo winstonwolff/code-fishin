@@ -1,5 +1,5 @@
 import { Player } from './player.js'
-import { INIT_USER_CONSOLE } from './UserConsole.js'
+import { ConsoleMessages } from './UserConsole.js'
 import { INIT_PLAYER_SCRIPT } from './playerScript.js'
 
 export const initialState = () => {
@@ -9,7 +9,7 @@ export const initialState = () => {
     frameDeltaMillis: 0,
     myPlayer,
     players: [myPlayer],
-    ...INIT_USER_CONSOLE,
+    ...ConsoleMessages.INITIAL_STATE,
     ...INIT_PLAYER_SCRIPT,
   }
 }
