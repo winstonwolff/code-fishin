@@ -1,6 +1,6 @@
 import { Player } from './player.js'
 import { ConsoleMessages } from './UserConsole.js'
-import { INIT_PLAYER_SCRIPT } from './playerScript.js'
+import { PlayerScript } from './playerScript.js'
 
 export const initialState = () => {
   const myPlayer = Player.new()
@@ -10,7 +10,7 @@ export const initialState = () => {
     myPlayer,
     players: [myPlayer],
     ...ConsoleMessages.INITIAL_STATE,
-    ...INIT_PLAYER_SCRIPT,
+    ...PlayerScript.INITIAL_STATE,
   }
 }
 

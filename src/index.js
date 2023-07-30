@@ -10,7 +10,7 @@ import * as k from './constants.js'
 import { X, Y } from './constants.js'
 import { Player } from './player.js'
 import { KeyTracker } from './keys.js'
-import { ScriptEditor, evalPlayerScript } from './playerScript.js'
+import { ScriptEditor, PlayerScript } from './playerScript.js'
 import { useAnimationFrame } from './useAnimationFrame.js'
 import { initialState } from './state.js'
 import { UserConsole } from './UserConsole.js'
@@ -36,7 +36,7 @@ const onAnimationFrame = updateState => timeDeltaMillis => {
     newPlayer = Player.think(newPlayer, timeDeltaSec)
 
     // Including the user's playerUpdates
-    const playerUpdates = evalPlayerScript({timeDeltaSec, keyTracker, playerScript: oldState.playerScript, updateState })
+    const playerUpdates = PlayerScript.eval({timeDeltaSec, keyTracker, playerScript: oldState.playerScript, updateState })
     newPlayer = playerUpdates.reduce(
       ((oldPlayer, playerUpdate) => playerUpdate(oldPlayer)),
       newPlayer
