@@ -1,6 +1,6 @@
-import { Player } from './player.js'
+import { Player } from './Player.js'
 import { ConsoleMessages } from './UserConsole.js'
-import { PlayerScript } from './playerScript.js'
+import { PlayerScript } from './PlayerScript.js'
 
 export const initialState = () => {
   const myPlayer = Player.new()

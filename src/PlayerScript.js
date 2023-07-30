@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { useState, useEffect, useRef, useReducer } from "react"
-import { Player } from './player.js'
+import { Player } from './Player.js'
 import { ConsoleMessages } from './UserConsole.js'
 
 const r = React.createElement
