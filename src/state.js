@@ -1,4 +1,6 @@
 import { Player } from './player.js'
+import { INIT_USER_CONSOLE } from './UserConsole.js'
+import { INIT_PLAYER_SCRIPT } from './playerScript.js'
 
 export const initialState = () => {
   const myPlayer = Player.new()
@@ -7,9 +9,8 @@ export const initialState = () => {
     frameDeltaMillis: 0,
     myPlayer,
     players: [myPlayer],
-    script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
-          + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n',
-    scriptErrors: [],
+    ...INIT_USER_CONSOLE,
+    ...INIT_PLAYER_SCRIPT,
   }
 }
 

@@ -16,10 +16,10 @@ export const Player = {
   new: () => {
     return {
       id: random.uniqueId(),
-      pos: [ random.randRange(0, k.STAGE_WIDTH),
-             random.randRange(0, k.STAGE_WIDTH)],
+      pos: [ random.randRange(0, k.ARENA_WIDTH),
+             random.randRange(0, k.ARENA_WIDTH)],
       direction: random.randRange(0, k.TAU), // in radians 0..6.t8
-      speed: 25.0, // stage-units/sec
+      speed: 25.0, // arena-units/sec
       color: random.choice(COLORS),
     }
   },
@@ -59,10 +59,10 @@ export const Player = {
     const deltaX = Math.cos(player.direction) * player.speed * timeDeltaSec
     const deltaY = Math.sin(player.direction) * player.speed * timeDeltaSec
     let newPlayer = icepick.assoc(player, 'pos', [
-      random.wrap(player.pos[X] + deltaX, 0, k.STAGE_WIDTH),
-      random.wrap(player.pos[Y] + deltaY, 0, k.STAGE_WIDTH)
-      // random.clamp(player.pos[X] + deltaX, 0, k.STAGE_WIDTH),
-      // random.clamp(player.pos[Y] + deltaY, 0, k.STAGE_WIDTH)
+      random.wrap(player.pos[X] + deltaX, 0, k.ARENA_WIDTH),
+      random.wrap(player.pos[Y] + deltaY, 0, k.ARENA_WIDTH)
+      // random.clamp(player.pos[X] + deltaX, 0, k.ARENA_WIDTH),
+      // random.clamp(player.pos[Y] + deltaY, 0, k.ARENA_WIDTH)
     ])
     return newPlayer
   },

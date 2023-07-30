@@ -1,12 +1,25 @@
 'use strict'
 
+import React, { useState, useEffect, useRef, useReducer } from "react"
 import { Player } from './player.js'
+import { updateConsole } from './UserConsole.js'
+
+const r = React.createElement
+
+export const INIT_PLAYER_SCRIPT = {
+  playerScript: {
+    script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
+            + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n',
+    scriptHash: 0,
+    lastEval: 0,
+  }
+}
 
 /*
     Execute user's script, returning a list of 'updatePlayer' functions the user has
     called.  Those functions take 'player' and return a modified Player
  */
-export const evalPlayerScript = ({timeDeltaSec, script, keyTracker}) => {
+export const evalPlayerScript = ({timeDeltaSec, playerScript, keyTracker, updateState}) => {
   let playerUpdates = []
 
   const isKeyPressed = key => keyTracker.isPressed(key)
@@ -19,19 +32,70 @@ export const evalPlayerScript = ({timeDeltaSec, script, keyTracker}) => {
     playerUpdates.push( player => Player.rudderStarboard(player, timeDeltaSec) )
   }
 
-  // Provide a scope for user's script with the relevant functions and symbols
-  // exposed, but not other symbols.
-  console.log('script=', script)
-  const scriptContainer = ({ isKeyPressed, rudderPort, rudderStarboard }) => {
-    eval(script)
-  }
-
   try {
+    // Provide a scope for user's script with the relevant functions and symbols
+    // exposed, but not other symbols.
+    // console.log('script=', script)
+    const scriptContainer = ({ isKeyPressed, rudderPort, rudderStarboard }) => {
+      eval(playerScript.script)
+    }
+
     scriptContainer({ isKeyPressed, rudderPort, rudderStarboard })
   } catch(e) {
     playerUpdates = []
-    console.error('evalPlayerScript:', e)
+    if (playerScript.lastEval !== playerScript.scriptHash) {
+      console.error('evalPlayerScript:', e)
+      updateConsole( e, updateState )
+
+      // Remember that we've already shown error for this version of script
+      updateState( oldState => ({
+        playerScript: {
+          ...oldState.playerScript,
+          lastEval: oldState.playerScript.scriptHash,
+        }
+      }))
+    }
   }
 
   return playerUpdates
+}
+
+const updatePlayerScript = (newScript, updateState) => {
+  updateState( (oldState) => ({
+    playerScript: {
+      script: newScript,
+      scriptHash: hashCode(newScript),
+      lastEval: oldState.playerScript.lastEval,
+    }
+  }))
+}
+
+export const ScriptEditor = ({playerScript, updateState}) => {
+
+  return (
+    r('div',
+      { class: 'ScriptEditor hack-panel' },
+      [
+        r('textarea',
+          { rows: 10,
+            value: playerScript.script,
+            onChange: event => updatePlayerScript( event.target.value, updateState ),
+            autocomplete: "off",
+            autocorrect: "off",
+            autocapitalize: "off",
+            spellcheck: "false",
+          }
+        ),
+      ]
+    )
+  )
+}
+
+// Returns 32 bit hash of a string. Not as good as MD5 or SHA-*
+// see https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+const hashCode = str => {
+  return str.split("").reduce(function(a, b) {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0)
 }
