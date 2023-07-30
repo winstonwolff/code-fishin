@@ -10,7 +10,7 @@ import * as k from './constants.js'
 import { X, Y } from './constants.js'
 import { Player } from './player.js'
 import { KeyTracker } from './keys.js'
-import { evalPlayerScript } from './playerScript.js'
+import { ScriptEditor, evalPlayerScript } from './playerScript.js'
 import { useAnimationFrame } from './useAnimationFrame.js'
 import { initialState } from './state.js'
 import { UserConsole } from './UserConsole.js'
@@ -36,7 +36,7 @@ const onAnimationFrame = updateState => timeDeltaMillis => {
     newPlayer = Player.think(newPlayer, timeDeltaSec)
 
     // Including the user's playerUpdates
-    const playerUpdates = evalPlayerScript({timeDeltaSec, keyTracker, script: oldState.script, updateState })
+    const playerUpdates = evalPlayerScript({timeDeltaSec, keyTracker, playerScript: oldState.playerScript, updateState })
     newPlayer = playerUpdates.reduce(
       ((oldPlayer, playerUpdate) => playerUpdate(oldPlayer)),
       newPlayer
@@ -112,8 +112,10 @@ const TheApp = () => {
           [ 'Clear Stale Players' ]),
       ]),
       r(ScriptEditor, {
-        script: state.script,
-        onChange: event => updateState( () => ({ script: event.target.value })),
+        playerScript: state.playerScript,
+        updateState
+        // onChange: event => updateState( () => ({ script: event.target.value })),
+        // onChange: event => updatePlayerScript( event.target.value, updateState ),
       }),
       r('div',
         { class: 'debug-info' }, [
@@ -164,23 +166,3 @@ const PlayerView = ({player}) => {
 
 
 
-const ScriptEditor = ({script, onChange}) => {
-
-  return (
-    r('div',
-      { class: 'ScriptEditor hack-panel' },
-      [
-        r('textarea',
-          { rows: 10,
-            value: script,
-            onChange: onChange,
-            autocomplete: "off",
-            autocorrect: "off",
-            autocapitalize: "off",
-            spellcheck: "false",
-          }
-        ),
-      ]
-    )
-  )
-}

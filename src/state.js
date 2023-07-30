@@ -9,8 +9,6 @@ export const initialState = () => {
     frameDeltaMillis: 0,
     myPlayer,
     players: [myPlayer],
-    script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
-          + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n',
     ...INIT_USER_CONSOLE,
     ...INIT_PLAYER_SCRIPT,
   }
