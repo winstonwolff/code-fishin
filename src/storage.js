@@ -26,24 +26,24 @@ const app = initializeApp(firebaseConfig);
 // Initialize Realtime Database and get a reference to the service
 const db = getDatabase(app);
 
-export const writePlayer = ( player ) => {
-  // console.log('writePlayer playerId=', player.id)
-  set(ref(db, `players/${player.id}`), player)
+export const writeShip = ( ship ) => {
+  // console.log('writeShip shipId=', ship.id)
+  set(ref(db, `ships/${ship.id}`), ship)
 }
 
-export const removePlayer = ( player ) => {
-  remove(ref(db, `players/${player.id}`))
+export const removeShip = ( ship ) => {
+  remove(ref(db, `ships/${ship.id}`))
 }
 
-// Register a callback when players change
-export const listenPlayers = (callback) => {
-  onValue(ref(db, 'players/'), snapshot => {
+// Register a callback when ships change
+export const listenShips = (callback) => {
+  onValue(ref(db, 'ships/'), snapshot => {
     callback({
       playersDict: snapshot.val() || []
     })
   })
 }
 
-export const clearPlayers = () => {
-  remove( ref(db, 'players'))
+export const clearShips = () => {
+  remove( ref(db, 'ships'))
 }

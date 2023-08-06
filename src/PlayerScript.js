@@ -1,7 +1,7 @@
 'use strict'
 
 import { createElement as r } from "react"
-import { Player } from './Player.js'
+import { Ship } from './Ship.js'
 import { ConsoleMessages } from './UserConsole.js'
 
 
@@ -29,7 +29,7 @@ export class PlayerScript {
 
   /*
       Execute user's script, returning a list of 'updatePlayer' functions the user has
-      called.  Those functions take 'player' and return a modified Player
+      called.  Those functions take 'ship' and return a modified Ship
    */
   static eval({timeDeltaSec, playerScript, keyTracker, updateState}) {
     let playerUpdates = []
@@ -37,11 +37,11 @@ export class PlayerScript {
     const isKeyPressed = key => keyTracker.isPressed(key)
 
     const rudderPort = () => {
-      playerUpdates.push( player => Player.rudderPort(player, timeDeltaSec) )
+      playerUpdates.push( ship => Ship.rudderPort(ship, timeDeltaSec) )
     }
 
     const rudderStarboard = () => {
-      playerUpdates.push( player => Player.rudderStarboard(player, timeDeltaSec) )
+      playerUpdates.push( ship => Ship.rudderStarboard(ship, timeDeltaSec) )
     }
 
     try {

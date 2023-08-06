@@ -4,7 +4,7 @@ import * as random from './random.js'
 import icepick from 'icepick'
 
 //
-//      Player
+//      Ship
 //
 const COLORS = [
   'blue', '#4E9258', '#6CBB3C', '#B2C248', '#EDE275', '#FFA62F',
@@ -12,7 +12,7 @@ const COLORS = [
 ]
 const ROT_PER_SEC = 1
 const ACC_PER_SEC = 20
-export const Player = {
+export const Ship = {
   new: () => {
     return {
       id: random.uniqueId(),
@@ -24,13 +24,13 @@ export const Player = {
     }
   },
 
-  checkKeys: (player, timeDeltaSec, keyTracker) => {
-    let newPlayer = player
+  checkKeys: (ship, timeDeltaSec, keyTracker) => {
+    let newPlayer = ship
     // if (keyTracker.isPressed('a') || keyTracker.isPressed('ArrowLeft')) {
-    //   newPlayer = Player.rudderStarboard(newPlayer, timeDeltaSec)
+    //   newPlayer = Ship.rudderStarboard(newPlayer, timeDeltaSec)
     // }
     // if (keyTracker.isPressed('d') || keyTracker.isPressed('ArrowRight')) {
-    //   newPlayer = Player.rudderPort(newPlayer, timeDeltaSec)
+    //   newPlayer = Ship.rudderPort(newPlayer, timeDeltaSec)
     // }
     if (keyTracker.isPressed('w') || keyTracker.isPressed('ArrowUp')) {
       // accelerate
@@ -45,24 +45,24 @@ export const Player = {
     return newPlayer
   },
 
-  rudderPort: (player, timeDeltaSec) => {
-      return icepick.assoc(player, 'direction',
-        player.direction - ROT_PER_SEC * timeDeltaSec)
+  rudderPort: (ship, timeDeltaSec) => {
+      return icepick.assoc(ship, 'direction',
+        ship.direction - ROT_PER_SEC * timeDeltaSec)
   },
 
-  rudderStarboard: (player, timeDeltaSec) => {
-      return icepick.assoc(player, 'direction',
-        player.direction + ROT_PER_SEC * timeDeltaSec)
+  rudderStarboard: (ship, timeDeltaSec) => {
+      return icepick.assoc(ship, 'direction',
+        ship.direction + ROT_PER_SEC * timeDeltaSec)
   },
 
-  think: (player, timeDeltaSec) => {
-    const deltaX = Math.cos(player.direction) * player.speed * timeDeltaSec
-    const deltaY = Math.sin(player.direction) * player.speed * timeDeltaSec
-    let newPlayer = icepick.assoc(player, 'pos', [
-      random.wrap(player.pos[X] + deltaX, 0, k.ARENA_WIDTH),
-      random.wrap(player.pos[Y] + deltaY, 0, k.ARENA_WIDTH)
-      // random.clamp(player.pos[X] + deltaX, 0, k.ARENA_WIDTH),
-      // random.clamp(player.pos[Y] + deltaY, 0, k.ARENA_WIDTH)
+  think: (ship, timeDeltaSec) => {
+    const deltaX = Math.cos(ship.direction) * ship.speed * timeDeltaSec
+    const deltaY = Math.sin(ship.direction) * ship.speed * timeDeltaSec
+    let newPlayer = icepick.assoc(ship, 'pos', [
+      random.wrap(ship.pos[X] + deltaX, 0, k.ARENA_WIDTH),
+      random.wrap(ship.pos[Y] + deltaY, 0, k.ARENA_WIDTH)
+      // random.clamp(ship.pos[X] + deltaX, 0, k.ARENA_WIDTH),
+      // random.clamp(ship.pos[Y] + deltaY, 0, k.ARENA_WIDTH)
     ])
     return newPlayer
   },

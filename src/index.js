@@ -8,7 +8,7 @@ import icepick from 'icepick'
 import * as storage from './storage.js'
 import * as k from './constants.js'
 import { X, Y } from './constants.js'
-import { Player } from './Player.js'
+import { Ship } from './Ship.js'
 import { KeyTracker } from './KeyTracker.js'
 import { ScriptEditor, PlayerScript } from './PlayerScript.js'
 import { useAnimationFrame } from './useAnimationFrame.js'
@@ -28,24 +28,24 @@ const onAnimationFrame = updateState => timeDeltaMillis => {
   const timeDeltaSec = timeDeltaMillis / 1000.0
 
   updateState( oldState => {
-    let newPlayer = oldState.myPlayer
+    let newShip = oldState.myShip
 
     // Run all the playerUpdate funcs
-    newPlayer = Player.checkKeys(newPlayer, timeDeltaSec, keyTracker)
-    newPlayer = Player.think(newPlayer, timeDeltaSec)
+    newShip = Ship.checkKeys(newShip, timeDeltaSec, keyTracker)
+    newShip = Ship.think(newShip, timeDeltaSec)
 
     // Including the user's playerUpdates
     const playerUpdates = PlayerScript.eval({timeDeltaSec, keyTracker, playerScript: oldState.playerScript, updateState })
-    newPlayer = playerUpdates.reduce(
+    newShip = playerUpdates.reduce(
       ((oldPlayer, playerUpdate) => playerUpdate(oldPlayer)),
-      newPlayer
+      newShip
     )
 
-    storage.writePlayer(newPlayer)
+    storage.writeShip(newShip)
 
     const stateChanges = {
       frameDeltaMillis: timeDeltaMillis,
-      myPlayer: newPlayer,
+      myShip: newShip,
     }
     return stateChanges
   })
@@ -77,8 +77,8 @@ const TheApp = () => {
   useAnimationFrame( onAnimationFrame(updateState), MIN_FRAME_MILLIS )
 
   const setup = () => {
-    storage.writePlayer(state.myPlayer)
-    storage.listenPlayers(onPlayerChange)
+    storage.writeShip(state.myShip)
+    storage.listenShips(onPlayerChange)
     setTimeout(
       () => keyTracker.listen(arenaRef.current),
       10)
@@ -91,24 +91,24 @@ const TheApp = () => {
   }
 
   const onPlayerChange = ({playersDict}) => {
-    const playersList = Object.values(playersDict)
-    // console.log('onPlayerchange players=', playersList)
-    updateState( () => ({ players: playersList }))
+    const shipsList = Object.values(playersDict)
+    // console.log('onPlayerchange ships=', shipsList)
+    updateState( () => ({ ships: shipsList }))
   }
 
   const onClearPlayers = event => {
-    storage.clearPlayers()
+    storage.clearShips()
   }
 
   return (
     r('div', {class: "TheApp"}, [
-      r(Arena, { players: state.players, ref: arenaRef }, [
+      r(Arena, { ships: state.ships, ref: arenaRef }, [
         r(UserConsole, {consoleMessages: state.consoleMessages, updateState}),
       ]),
       r('div', { class: 'button-bar' }, [
         r('button',
           { onClick: onClearPlayers },
-          [ 'Clear Stale Players' ]),
+          [ 'Clear Stale Ships' ]),
       ]),
       r(ScriptEditor, {
         playerScript: state.playerScript,
@@ -128,8 +128,8 @@ const TheApp = () => {
 
 
 // The sea where the player's ship and other ships appear
-const Arena = React.forwardRef(({players, children}, ref) => {
-  // console.log('Arena called. players=', players)
+const Arena = React.forwardRef(({ships, children}, ref) => {
+  // console.log('Arena called. ships=', ships)
   return (
     r('div',
       {class: "Arena", tabIndex: 0, autofocus: 1, ref},
@@ -140,7 +140,7 @@ const Arena = React.forwardRef(({players, children}, ref) => {
             width: "400",
             height: "400",
           },
-          players.map( player => r(PlayerView, {player}) )
+          ships.map( ship => r(PlayerView, {ship}) )
         ),
         ...children,
       ]
@@ -150,14 +150,14 @@ const Arena = React.forwardRef(({players, children}, ref) => {
 
 
 // The player's ship
-const PlayerView = ({player}) => {
+const PlayerView = ({ship}) => {
   return r('ellipse',
     { rx: 30,
       ry: 10,
-      fill: player.color,
+      fill: ship.color,
       transform: (
-        `translate(${Math.round(player.pos[X])} ${Math.round(player.pos[Y])}) `
-        + ` rotate(${Math.round(player.direction * k.RAD_TO_DEG)})`
+        `translate(${Math.round(ship.pos[X])} ${Math.round(ship.pos[Y])}) `
+        + ` rotate(${Math.round(ship.direction * k.RAD_TO_DEG)})`
       )
     }
   )
