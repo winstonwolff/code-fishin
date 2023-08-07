@@ -4,13 +4,20 @@ import { createElement as r } from "react"
 import { Ship } from './Ship.js'
 import { ConsoleMessages } from './UserConsole.js'
 
+const INITIAL_SCRIPT = `
+if (isKeyPressed("ArrowRight")) rudderStarboard()
+// if (isKeyPressed("ArrowLeft")) rudderPort()
+if (isKeyPressed("=")) throttle(+1)
+if (isKeyPressed("-")) throttle(-1)
+if (isKeyPressed("]")) mixture(+1)
+if (isKeyPressed("[")) mixture(-1)
+`.trim()
 
 export class PlayerScript {
 
   static INITIAL_STATE = {
     playerScript: {
-      script: 'if (isKeyPressed("ArrowRight")) rudderStarboard()\n'
-              + '// if (isKeyPressed("ArrowLeft")) rudderPort()\n',
+      script: INITIAL_SCRIPT,
       scriptHash: 0,
       lastEval: 0,
     }
@@ -34,25 +41,47 @@ export class PlayerScript {
   static eval({timeDeltaSec, playerScript, keyTracker, updateState}) {
     let playerUpdates = []
 
-    const isKeyPressed = key => keyTracker.isPressed(key)
+    const PLAYER_COMMANDS = {
+      isKeyPressed: key => keyTracker.isPressed(key),
 
-    const rudderPort = () => {
-      playerUpdates.push( ship => Ship.rudderPort(ship, timeDeltaSec) )
-    }
+      rudderPort: () => {
+        playerUpdates.push( ship => Ship.rudderPort(ship, timeDeltaSec) )
+      },
 
-    const rudderStarboard = () => {
-      playerUpdates.push( ship => Ship.rudderStarboard(ship, timeDeltaSec) )
+      rudderStarboard: () => {
+        playerUpdates.push( ship => Ship.rudderStarboard(ship, timeDeltaSec) )
+      },
+
+      // direction = +1 or -1
+      throttle: (direction) => {
+        playerUpdates.push(
+          ship => Ship.changeThrottle(ship, Ship.THROTTLE_PER_SEC * timeDeltaSec * Math.sign(direction))
+        )
+      },
+
+      // direction = +1 or -1
+      mixture: (direction) => {
+        playerUpdates.push(
+          ship => Ship.changeMixture(ship, Ship.MIXTURE_PER_SEC * timeDeltaSec * Math.sign(direction))
+        )
+      },
     }
 
     try {
       // Provide a scope for user's script with the relevant functions and symbols
       // exposed, but not other symbols.
       // console.log('script=', script)
-      const scriptContainer = ({ isKeyPressed, rudderPort, rudderStarboard }) => {
+      const scriptContainer = ({
+        isKeyPressed,
+        rudderPort,
+        rudderStarboard,
+        throttle,
+        mixture,
+      }) => {
         eval(playerScript.script)
       }
 
-      scriptContainer({ isKeyPressed, rudderPort, rudderStarboard })
+      scriptContainer(PLAYER_COMMANDS)
     } catch(e) {
       playerUpdates = []
       if (playerScript.lastEval !== playerScript.scriptHash) {

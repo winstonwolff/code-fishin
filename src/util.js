@@ -35,3 +35,10 @@ export const randInt = (low, high) => {
 export const choice = (arr) => {
   return arr[randInt(0, arr.length)]
 }
+
+//   round(1234.5678, -2) = 1200
+//   round(1234.5678, 2) = 1234.57
+export const round = (value, place) => {
+  const tens = Math.pow(10, place)
+  return Math.round(value * tens) / tens
+}

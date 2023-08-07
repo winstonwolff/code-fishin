@@ -14,6 +14,7 @@ import { ScriptEditor, PlayerScript } from './PlayerScript.js'
 import { useAnimationFrame } from './useAnimationFrame.js'
 import { initialState } from './state.js'
 import { UserConsole } from './UserConsole.js'
+import * as util from './util.js'
 
 const MIN_FRAME_MILLIS = 33
 
@@ -31,7 +32,6 @@ const onAnimationFrame = updateState => timeDeltaMillis => {
     let newShip = oldState.myShip
 
     // Run all the playerUpdate funcs
-    newShip = Ship.checkKeys(newShip, timeDeltaSec, keyTracker)
     newShip = Ship.think(newShip, timeDeltaSec)
 
     // Including the user's playerUpdates
@@ -109,6 +109,16 @@ const TheApp = () => {
         r('button',
           { onClick: onClearPlayers },
           [ 'Clear Stale Ships' ]),
+        r('div', {},
+          [`heading: ${Ship.heading(state.myShip)}`,
+          ]),
+        r('div', {},
+          [`thr: ${util.round(state.myShip.throttle, 2)
+          } mix: ${util.round(state.myShip.mixture, 2)
+          } pow: ${util.round(Ship.power(state.myShip), 2)
+          } spd: ${util.round(Ship.speed(state.myShip), 2)
+          }`,
+          ]),
       ]),
       r(ScriptEditor, {
         playerScript: state.playerScript,
