@@ -5,6 +5,18 @@
   --color-
 }
 
+body {
+  font-family: Lato;
+}
+
+h1 {
+  font-weight: 900;
+}
+
+h2 {
+  font-weight: 400;
+}
+
 .TheApp .debug-info {
   font-family: monaco;
   font-size: 10px;
