@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "constants.js",
+  "sourceRoot": "../",
+  "sources": [
+    "src/constants.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAEC;;;AAED,OAAA,IAAO,CAAA,GAAI;;AACX,OAAA,IAAO,CAAA,GAAI;;AAEX,OAAA,IAAO,WAAA,GAAc;;AAErB,OAAA,IAAO,GAAA,GAAM,IAAI,CAAC,EAAL,GAAU;;AACvB,OAAA,IAAO,UAAA,GAAa,cARnB;;AASD,OAAA,IAAO,UAAA,GAAa",
+  "sourcesContent": [
+    "#\n#     Constants\n#\n\nexport X = 0\nexport Y = 1\n\nexport ARENA_WIDTH = 1000\n\nexport TAU = Math.PI * 2\nexport RAD_TO_DEG = 57.2957795131 # 360 / (PI * 2)\nexport DEG_TO_RAD = 0.01745329252\n\n"
+  ]
+}

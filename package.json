@@ -1,4 +1,7 @@
 {
   "private": true,
-  "scripts": {}
+  "scripts": {},
+  "devDependencies": {
+    "coffeescript": "^2.7.0"
+  }
 }
